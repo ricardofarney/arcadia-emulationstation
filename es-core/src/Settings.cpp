@@ -133,6 +133,10 @@ void Settings::setDefaults()
 	mBoolMap["SplashScreenProgress"] = true;
 	mBoolMap["StartupOnGameList"] = false;
 	mStringMap["StartupSystem"] = "lastsystem";
+	// Arcadia: consoles favoritos (Y na tela inicial), ordem da tela inicial e menu simplificado
+	mStringMap["FavoriteSystems"] = "";
+	mBoolMap["ArcadiaFavoriteSystems"] = true;
+	mBoolMap["ArcadiaMenuSimples"] = true;
 
 #if WIN32
 	mBoolMap["HidJoysticks"] = true;

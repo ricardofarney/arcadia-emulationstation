@@ -431,6 +431,9 @@ void CollectionSystemManager::updateSystemsList()
 				sysIt++;
 		}
 	}
+
+	// Arcadia: consoles favoritos primeiro, depois "Continuar jogando" e "Favoritos"
+	SystemData::applyArcadiaSystemOrder();
 }
 
 /* Methods to manage collection files related to a source FileData */

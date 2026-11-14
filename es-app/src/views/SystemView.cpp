@@ -266,6 +266,25 @@ void SystemView::populate()
 		grid->preloadTiles();
 }
 
+// Arcadia: marca/desmarca o console selecionado como favorito e reordena a tela inicial
+void SystemView::toggleFavoriteSystem()
+{
+	SystemData* system = getSelected();
+	if (system == nullptr || system->isCollection() || !system->isGameSystem())
+		return;
+
+	bool favorite = SystemData::toggleFavoriteSystem(system->getName());
+
+	SystemData::applyArcadiaSystemOrder();
+	populate();
+	goToSystem(system, false);
+	updateHelpPrompts();
+
+	mWindow->displayNotificationMessage(_U("\uF005  ") + (favorite ?
+		Utils::String::format(_("%s ADDED TO FAVORITE CONSOLES").c_str(), system->getFullName().c_str()) :
+		Utils::String::format(_("%s REMOVED FROM FAVORITE CONSOLES").c_str(), system->getFullName().c_str())));
+}
+
 void SystemView::goToSystem(SystemData* system, bool animate)
 {
 	mLastCursor = -1;
@@ -391,7 +410,12 @@ bool SystemView::input(InputConfig* config, Input input)
 {
 	if (mYButton.isShortPressed(config, input))
 	{
-		showQuickSearch();
+		// Arcadia: toque curto no Y marca/desmarca o console como favorito (segurar o Y continua sendo a busca)
+		if (Settings::getInstance()->getBool("ArcadiaFavoriteSystems"))
+			toggleFavoriteSystem();
+		else
+			showQuickSearch();
+
 		return true;
 	}
 
@@ -945,6 +969,17 @@ std::vector<HelpPrompt> SystemView::getHelpPrompts()
 
 	if (SystemData::IsManufacturerSupported)
 		prompts.push_back(HelpPrompt("b", _("NAVIGATION BAR"), [&] { showNavigationBar(); }));
+
+	// Arcadia: Y = favoritar console (substitui o texto de busca, que continua no Y segurado)
+	if (Settings::getInstance()->getBool("ArcadiaFavoriteSystems"))
+	{
+		for (auto it = prompts.begin(); it != prompts.end(); )
+		{
+			if (it->first == "y") it = prompts.erase(it); else it++;
+		}
+
+		prompts.push_back(HelpPrompt("y", _("FAVORITE CONSOLE"), [&] { toggleFavoriteSystem(); }));
+	}
 
 #ifdef _ENABLE_FILEMANAGER_
 	if (UIModeController::getInstance()->isUIModeFull()) {

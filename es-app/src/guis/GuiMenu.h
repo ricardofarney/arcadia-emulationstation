@@ -43,7 +43,7 @@ struct sScreenBorders
 class GuiMenu : public GuiComponent
 {
 public:
-        GuiMenu(Window* window, bool animate = true);
+        GuiMenu(Window* window, bool animate = true, bool arcadiaCompleto = false); // Arcadia: arcadiaCompleto = menu completo ("Modo avancado")
 
         bool input(InputConfig* config, Input input) override;
         void onSizeChanged() override;
@@ -61,6 +61,8 @@ public:
 private:
         void addEntry(const std::string& name, bool add_arrow, const std::function<void()>& func, const std::string iconName = "");
         void addVersionInfo();
+        void addArcadiaEntries();   // Arcadia: menu simplificado (DESIGN.md)
+        void openArcadiaSomTela();  // Arcadia: "Som e tela"
         void openCollectionSystemSettings();
         void openConfigInput(); 
         void openScraperSettings();

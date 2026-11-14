@@ -42,7 +42,8 @@ static std::map<std::string, std::function<BindableProperty(SystemData*)>> prope
 	{ "hardwareType",		[] (SystemData* sys) { return sys->getSystemMetadata().hardwareType; } },
 	{ "command",			[] (SystemData* sys) { return sys->getSystemEnvData()->mLaunchCommand; } },
 	{ "group",				[] (SystemData* sys) { return sys->getSystemEnvData()->mGroup; } },		
-	{ "collection",			[] (SystemData* sys) { return sys->isCollection(); } },		
+	{ "collection",			[] (SystemData* sys) { return sys->isCollection(); } },
+	{ "favorite",			[] (SystemData* sys) { return !sys->isCollection() && SystemData::isFavoriteSystem(sys->getName()); } }, // Arcadia		
 	{ "showManual",         [] (SystemData* sys) { return sys->getBoolSetting("ShowManualIcon"); } },
 	{ "showSaveStates",     [] (SystemData* sys) { return sys->getBoolSetting("ShowSaveStates"); } },
 	{ "showCheevos",        [] (SystemData* sys) { return sys->getShowCheevosIcon() && sys->getBoolSetting("ShowCheevosIcon"); } },
@@ -1911,6 +1912,48 @@ bool SystemData::hasEmulatorSelection()
 	}
 
 	return ec > 1 || cc > 1;
+}
+
+// ---------------------------------------------------------------------------
+// Arcadia: consoles favoritos
+// ---------------------------------------------------------------------------
+bool SystemData::isFavoriteSystem(const std::string& name)
+{
+	auto list = Utils::String::split(Settings::getInstance()->getString("FavoriteSystems"), ',', true);
+	return std::find(list.cbegin(), list.cend(), name) != list.cend();
+}
+
+bool SystemData::toggleFavoriteSystem(const std::string& name)
+{
+	auto list = Utils::String::split(Settings::getInstance()->getString("FavoriteSystems"), ',', true);
+	auto it = std::find(list.begin(), list.end(), name);
+	bool favorite = (it == list.end());
+	if (favorite)
+		list.push_back(name);
+	else
+		list.erase(it);
+
+	Settings::getInstance()->setString("FavoriteSystems", Utils::String::join(list, ","));
+	Settings::getInstance()->saveFile();
+	return favorite;
+}
+
+// Ordem da tela inicial: consoles favoritos > "Continuar jogando" e "Favoritos" > demais
+void SystemData::applyArcadiaSystemOrder()
+{
+	if (!Settings::getInstance()->getBool("ArcadiaFavoriteSystems"))
+		return;
+
+	auto rank = [](SystemData* sys)
+	{
+		if (!sys->isCollection() && isFavoriteSystem(sys->getName()))
+			return 0;
+		if (sys->isCollection() && (sys->getName() == "recent" || sys->getName() == "favorites"))
+			return sys->getName() == "recent" ? 1 : 2;
+		return 3;
+	};
+
+	std::stable_sort(sSystemVector.begin(), sSystemVector.end(), [&rank](SystemData* a, SystemData* b) { return rank(a) < rank(b); });
 }
 
 SystemData* SystemData::getSystem(const std::string name)

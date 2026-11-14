@@ -37,6 +37,7 @@ public:
 	~SystemView();
 
 	void goToSystem(SystemData* system, bool animate);
+	void toggleFavoriteSystem(); // Arcadia
 
 	void onThemeChanged(const std::shared_ptr<ThemeData>& theme);
 	void reloadTheme(SystemData* system);

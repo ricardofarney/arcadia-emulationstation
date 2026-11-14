@@ -136,17 +136,27 @@ void GuiSaveState::loadGrid()
 	}
 #endif
 
-	mGrid->add(_("START NEW GAME"), ":/freeslot.svg", SaveStateItem(mRepository->getDefaultNewGameSaveState()));
+	// Arcadia: o save automatico vem primeiro ("Continuar de onde parei"), depois "Comecar do inicio"
+	auto autoSaveState = std::find_if(states.cbegin(), states.cend(), [](SaveState* x) { return x->slot == -1; });
+	if (autoSaveState != states.cend())
+	{
+		SaveState* autoItem = *autoSaveState;
+		mGrid->add(_("CONTINUE WHERE I LEFT OFF") + std::string("\r\n") + autoItem->creationDate.toLocalTimeString(), autoItem->getScreenShot(), SaveStateItem(autoItem));
+	}
+
+	mGrid->add(_("START FROM THE BEGINNING"), ":/freeslot.svg", SaveStateItem(mRepository->getDefaultNewGameSaveState()));
 
 	if (mRepository->supportsAutoSave() && mGame->getCurrentGameSetting("autosave") == "1")
 	{
-		auto autoSave = std::find_if(states.cbegin(), states.cend(), [](SaveState* x) { return x->slot == -1; });
-		if (autoSave == states.cend())
+		if (autoSaveState == states.cend())
 			mGrid->add(_("START NEW AUTO SAVE"), ":/freeslot.svg", SaveStateItem(mRepository->getDefaultAutoSaveSaveState()));
 	}
 
 	for (auto item : states)
 	{
+		if (autoSaveState != states.cend() && item == *autoSaveState)
+			continue; // Arcadia: ja mostrado no topo
+
 		std::string coreinfo;
 		
 		if (item->config != nullptr && !item->config->emulator.empty() && !item->config->isActiveConfig(mGame))

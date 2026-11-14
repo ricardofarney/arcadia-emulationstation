@@ -199,13 +199,20 @@ int* getVideoModeDimensions(std::string videomode, std::vector<std::string> resl
 
 #endif
 
-GuiMenu::GuiMenu(Window *window, bool animate) : GuiComponent(window), mMenu(window, _("MAIN MENU").c_str()), mVersion(window)
+GuiMenu::GuiMenu(Window *window, bool animate, bool arcadiaCompleto) : GuiComponent(window), mMenu(window, _("MAIN MENU").c_str()), mVersion(window)
 {
 	// MAIN MENU
 	bool isFullUI = !UIModeController::getInstance()->isUIModeKid() && !UIModeController::getInstance()->isUIModeKiosk();
 #ifdef _ENABLEEMUELEC
 	bool isKidUI = UIModeController::getInstance()->isUIModeKid();
 #endif
+
+	// Arcadia: menu simplificado com 6 itens (docs/DESIGN.md); o menu completo fica em "Modo avancado"
+	bool arcadiaSimples = !arcadiaCompleto && isFullUI && Settings::getInstance()->getBool("ArcadiaMenuSimples");
+	if (arcadiaSimples)
+		addArcadiaEntries();
+	else
+	{
 
 	// KODI >
 	// GAMES SETTINGS >
@@ -314,6 +321,8 @@ if (!isKidUI)
 	addEntry(_("QUIT").c_str(), true, [this] { openQuitMenu(); }, "iconQuit");
 #endif
 	
+	} // Arcadia: fim do menu completo
+
 	addChild(&mMenu);
 	addVersionInfo();
 	setSize(mMenu.getSize());
@@ -1476,6 +1485,47 @@ void GuiMenu::onSizeChanged()
 
 	mVersion.setSize(mSize.x(), h);
 	mVersion.setPosition(0, mSize.y() - h);
+}
+
+// ---------------------------------------------------------------------------
+// Arcadia: menu simplificado (docs/DESIGN.md, tela "e")
+// ---------------------------------------------------------------------------
+void GuiMenu::addArcadiaEntries()
+{
+	Window* window = mWindow;
+
+	addEntry(_("WI-FI"), true, [this] { openNetworkSettings(); }, "iconNetwork");
+	addEntry(_("PAIR BLUETOOTH CONTROLLER"), false, [window] { ThreadedBluetooth::start(window); }, "iconControllers");
+	addEntry(_("CONFIGURE BUTTONS"), true, [this] { openConfigInput(); }, "iconControllers");
+	addEntry(_("UPDATES"), true, [this] { openUpdatesSettings(); }, "iconUpdates");
+	addEntry(_("SOUND AND DISPLAY"), true, [this] { openArcadiaSomTela(); }, "iconSound");
+	addEntry(_("SAFE SHUTDOWN"), false, [window]
+	{
+		window->pushGui(new GuiMsgBox(window, _("REALLY SHUTDOWN?"),
+			_("YES"), [] { Utils::Platform::quitES(Utils::Platform::QuitMode::SHUTDOWN); },
+			_("NO"), nullptr));
+	}, "iconShutdown");
+
+	// opcoes tecnicas do EmuELEC: menu completo
+	addEntry(_("ADVANCED MODE"), true, [this]
+	{
+		Window* w = mWindow;
+		delete this;
+		w->pushGui(new GuiMenu(w, false, true));
+	}, "iconAdvanced");
+}
+
+void GuiMenu::openArcadiaSomTela()
+{
+	Window* window = mWindow;
+	auto s = new GuiSettings(window, _("SOUND AND DISPLAY").c_str());
+	s->addEntry(_("SOUND SETTINGS"), true, [this] { openSoundSettings(); }, "iconSound");
+#ifdef _ENABLEEMUELEC
+	s->addEntry(_("DISPLAY"), true, [this] { openEmuELECSettings(); }, "iconSystem");
+#else
+	s->addEntry(_("DISPLAY"), true, [this] { openUISettings(); }, "iconUI");
+#endif
+	window->pushGui(s);
 }
 
 void GuiMenu::addEntry(const std::string& name, bool add_arrow, const std::function<void()>& func, const std::string iconName)

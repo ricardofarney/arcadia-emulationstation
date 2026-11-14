@@ -86,6 +86,11 @@ public:
 	~SystemData();
 
 	static SystemData* getSystem(const std::string name);
+
+	// Arcadia: consoles favoritos (lista "FavoriteSystems" no es_settings.cfg, area do usuario)
+	static bool isFavoriteSystem(const std::string& name);
+	static bool toggleFavoriteSystem(const std::string& name); // retorna o novo estado
+	static void applyArcadiaSystemOrder();
 	static SystemData* getFirstVisibleSystem();
 
 	inline FolderData* getRootFolder() const { return mRootFolder; };

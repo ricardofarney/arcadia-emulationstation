@@ -2163,7 +2163,7 @@ msgid "SHUTDOWN SYSTEM"
 msgstr "DESLIGAR SISTEMA"
 
 msgid "REALLY SHUTDOWN?"
-msgstr "DESEJA DESLIGAR ?"
+msgstr "DESLIGAR O CONSOLE?"
 
 msgid "FAST SHUTDOWN SYSTEM"
 msgstr "DESLIGAR SISTEMA RAPIDAMENTE"
@@ -2505,7 +2505,7 @@ msgid "UNINSTALLATION ADDED TO QUEUE"
 msgstr "DESINSTALAÇÃO ADICIONADA À FILA"
 
 msgid "SAVESTATE MANAGER"
-msgstr "GERENCIADOR DE ESTADOS DE SALVAMENTO"
+msgstr "ONDE VOCÊ QUER COMEÇAR?"
 
 msgid "START NEW GAME"
 msgstr "INICIAR NOVO JOGO"
@@ -3903,3 +3903,55 @@ msgstr ""
 
 #~ msgid "VIEW BATOCERA MANUAL"
 #~ msgstr "VISUALIZAR MANUAL DO BATOCERA"
+
+#: Arcádia
+msgid "WI-FI"
+msgstr "WI-FI"
+
+#: Arcádia
+msgid "PAIR BLUETOOTH CONTROLLER"
+msgstr "PAREAR CONTROLE BLUETOOTH"
+
+#: Arcádia
+msgid "CONFIGURE BUTTONS"
+msgstr "CONFIGURAR BOTÕES"
+
+#: Arcádia
+msgid "UPDATES"
+msgstr "ATUALIZAÇÕES"
+
+#: Arcádia
+msgid "SOUND AND DISPLAY"
+msgstr "SOM E TELA"
+
+#: Arcádia
+msgid "DISPLAY"
+msgstr "TELA"
+
+#: Arcádia
+msgid "SAFE SHUTDOWN"
+msgstr "DESLIGAR COM SEGURANÇA"
+
+#: Arcádia
+msgid "ADVANCED MODE"
+msgstr "MODO AVANÇADO"
+
+#: Arcádia
+msgid "FAVORITE CONSOLE"
+msgstr "FAVORITAR CONSOLE"
+
+#: Arcádia
+msgid "%s ADDED TO FAVORITE CONSOLES"
+msgstr "%s ADICIONADO AOS CONSOLES FAVORITOS"
+
+#: Arcádia
+msgid "%s REMOVED FROM FAVORITE CONSOLES"
+msgstr "%s REMOVIDO DOS CONSOLES FAVORITOS"
+
+#: Arcádia
+msgid "CONTINUE WHERE I LEFT OFF"
+msgstr "CONTINUAR DE ONDE PAREI"
+
+#: Arcádia
+msgid "START FROM THE BEGINNING"
+msgstr "COMEÇAR DO INÍCIO"
