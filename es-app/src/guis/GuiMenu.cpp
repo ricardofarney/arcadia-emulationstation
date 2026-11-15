@@ -1435,7 +1435,13 @@ void GuiMenu::addVersionInfo()
 		else
 		{
 #ifdef _ENABLEEMUELEC	
-		label = "EMUELEC ES V" + ApiSystem::getInstance()->getVersion() + buildDate + " IP:" + Utils::Platform::getShOutput(R"(/usr/bin/emuelec-utils getip)");
+		// Arcadia: mostra a versao do sistema (EE_VERSION) e o IP so quando houver rede
+		std::string arcadiaVersion = Utils::FileSystem::exists("/usr/config/EE_VERSION") ? Utils::String::replace(Utils::String::replace(Utils::FileSystem::readAllText("/usr/config/EE_VERSION"), "\r", ""), "\n", "") : "";
+		std::string arcadiaIp = Utils::String::trim(Utils::Platform::getShOutput(R"(/usr/bin/emuelec-utils getip)"));
+		if (!arcadiaVersion.empty())
+			label = std::string("ARC" "\xC3\x81" "DIA ") + arcadiaVersion + (arcadiaIp.empty() ? "" : "  -  IP " + arcadiaIp);
+		else
+			label = "EMUELEC ES V" + ApiSystem::getInstance()->getVersion() + buildDate + " IP:" + Utils::Platform::getShOutput(R"(/usr/bin/emuelec-utils getip)");
 #else
 			std::string aboutInfo = ApiSystem::getInstance()->getApplicationName() + " V" + ApiSystem::getInstance()->getVersion();
 			label = aboutInfo + buildDate;
