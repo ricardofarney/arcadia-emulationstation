@@ -1517,6 +1517,10 @@ void SystemView::onShow()
 
 	mCarousel.onShow();
 
+	// Arcadia: as contagens podem ter mudado enquanto se jogava (Continuar jogando, Favoritos)
+	if (mCarousel.isGrid())
+		mCarousel.asGrid()->refreshBindings();
+
 	activateExtras(mCarousel.getCursorIndex());
 
 	for (auto sb : mStaticBackgrounds)

@@ -8,9 +8,10 @@
 #include "guis/GuiMsgBox.h"
 #include "SaveStateRepository.h"
 
-#define WINDOW_HEIGHT Renderer::getScreenHeight() * 0.40f
+// Arcadia: janela um pouco mais alta para caber "CONTINUAR DE ONDE PAREI" + data/hora
+#define WINDOW_HEIGHT Renderer::getScreenHeight() * 0.48f
 
-static int slots = 6; // 5;
+static int slots = 4; // Arcadia: cartoes mais largos (era 6)
 
 GuiSaveState::GuiSaveState(Window* window, FileData* game, const std::function<void(SaveState* state)>& callback) :
 	GuiComponent(window), mGrid(nullptr), mBackground(window, ":/frame.png"),
@@ -41,7 +42,7 @@ GuiSaveState::GuiSaveState(Window* window, FileData* game, const std::function<v
 	float screenProportion = (float)Renderer::getScreenWidth() / (float)Renderer::getScreenHeight();
 
 	float sh = (float)Math::min(Renderer::getScreenHeight(), Renderer::getScreenWidth());
-	sh = (float) theme->TextSmall.font->getSize() / sh;
+	sh = (float) theme->TextSmall.font->getSize() * 0.85f / sh; // Arcadia: fonte um pouco menor para caber 2 linhas (texto + data/hora)
 
 	std::string xml =
 		"<theme defaultView=\"Tiles\">"
@@ -71,7 +72,7 @@ GuiSaveState::GuiSaveState(Window* window, FileData* game, const std::function<v
 		"  <fontSize>" + std::to_string(sh) + "</fontSize>"
 		"  <alignment>center</alignment>"
 		"  <singleLineScroll>false</singleLineScroll>"
-		"  <size>1 0.30</size>"
+		"  <size>1 0.42</size>"
 		"</text>"
 		"<text name=\"gridtile:selected\">"
 		"  <color>" + Utils::String::toHexString(theme->Text.selectedColor) + "</color>"

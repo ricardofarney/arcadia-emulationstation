@@ -108,6 +108,21 @@ public:
 	virtual void onScreenSaverActivate();
 	virtual void onScreenSaverDeactivate();
 
+	// Arcadia: reaplica os bindings ({system:total} etc.) nos cartoes ja criados,
+	// para a contagem de jogos ficar certa ao voltar de um jogo (ex.: Continuar jogando)
+	void refreshBindings()
+	{
+		for (auto& entry : mEntries)
+		{
+			if (entry.data.tile == nullptr)
+				continue;
+
+			IBindable* bindable = getBindable(entry);
+			if (bindable != nullptr)
+				entry.data.tile->updateBindings(bindable);
+		}
+	}
+
 	virtual void setOpacity(unsigned char opacity);
 
 	ImageSource		getImageSource() { return mImageSource; };
