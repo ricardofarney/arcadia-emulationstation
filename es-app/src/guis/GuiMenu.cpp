@@ -1502,7 +1502,7 @@ void GuiMenu::addArcadiaEntries()
 
 	addEntry(_("WI-FI"), true, [this] { openNetworkSettings(); }, "iconNetwork");
 	addEntry(_("PAIR BLUETOOTH CONTROLLER"), false, [window] { ThreadedBluetooth::start(window); }, "iconControllers");
-	addEntry(_("CONFIGURE BUTTONS"), true, [this] { openConfigInput(); }, "iconControllers");
+	addEntry(_("CONFIGURE BUTTONS"), true, [this] { openArcadiaBotoes(); }, "iconControllers");
 	addEntry(_("UPDATES"), true, [this] { openUpdatesSettings(); }, "iconUpdates");
 	addEntry(_("SOUND AND DISPLAY"), true, [this] { openArcadiaSomTela(); }, "iconSound");
 	addEntry(_("SAFE SHUTDOWN"), false, [window]
@@ -1519,6 +1519,16 @@ void GuiMenu::addArcadiaEntries()
 		delete this;
 		w->pushGui(new GuiMenu(w, false, true));
 	}, "iconAdvanced");
+}
+
+// Arcadia: "Configurar botoes" = mapear um controle + ordem dos jogadores (ate 4)
+void GuiMenu::openArcadiaBotoes()
+{
+	Window* window = mWindow;
+	auto s = new GuiSettings(window, _("CONFIGURE BUTTONS").c_str());
+	s->addEntry(_("MAP A CONTROLLER"), true, [this] { openConfigInput(); }, "iconControllers");
+	s->addEntry(_("PLAYER ORDER"), true, [window] { GuiControllersSettings::openArcadiaPlayerOrder(window); }, "iconControllers");
+	window->pushGui(s);
 }
 
 void GuiMenu::openArcadiaSomTela()

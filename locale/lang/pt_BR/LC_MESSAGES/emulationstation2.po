@@ -3955,3 +3955,27 @@ msgstr "CONTINUAR DE ONDE PAREI"
 #: Arcádia
 msgid "START FROM THE BEGINNING"
 msgstr "COMEÇAR DO INÍCIO"
+
+#: Arcádia
+msgid "MAP A CONTROLLER"
+msgstr "MAPEAR UM CONTROLE"
+
+#: Arcádia
+msgid "PLAYER ORDER"
+msgstr "ORDEM DOS JOGADORES"
+
+#: Arcádia
+msgid "WHICH CONTROLLER EACH PLAYER USES"
+msgstr "QUAL CONTROLE CADA JOGADOR USA"
+
+#: Arcádia
+msgid "PLAYER %i"
+msgstr "JOGADOR %i"
+
+#: Arcádia
+msgid "AUTOMATIC"
+msgstr "AUTOMÁTICO"
+
+#: Arcádia
+msgid "RESET TO CONNECTION ORDER"
+msgstr "VOLTAR À ORDEM DE CONEXÃO"

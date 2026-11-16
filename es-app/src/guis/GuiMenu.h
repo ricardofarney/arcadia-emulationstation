@@ -63,6 +63,7 @@ private:
         void addVersionInfo();
         void addArcadiaEntries();   // Arcadia: menu simplificado (DESIGN.md)
         void openArcadiaSomTela();  // Arcadia: "Som e tela"
+        void openArcadiaBotoes();   // Arcadia: "Configurar botoes" (mapear + ordem dos jogadores)
         void openCollectionSystemSettings();
         void openConfigInput(); 
         void openScraperSettings();

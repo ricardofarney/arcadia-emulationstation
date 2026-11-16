@@ -40,10 +40,19 @@ void GuiControllersSettings::openControllersSettings(Window* wnd, int autoSel)
 	wnd->pushGui(new GuiControllersSettings(wnd, autoSel));
 }
 
-GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSettings(wnd, controllers_settings_label.c_str())
+// Arcadia: so a atribuicao de controles aos jogadores 1 a 4 (docs/MULTIJOGADOR.md)
+void GuiControllersSettings::openArcadiaPlayerOrder(Window* wnd)
+{
+	wnd->pushGui(new GuiControllersSettings(wnd, 0, true));
+}
+
+GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel, bool arcadiaOrdem) : GuiSettings(wnd, arcadiaOrdem ? _("PLAYER ORDER").c_str() : controllers_settings_label.c_str())
 {
 	Window* window = mWindow;
 
+	// Arcadia: na tela "Ordem dos jogadores" ficam so os jogadores (sem as opcoes tecnicas)
+	if (!arcadiaOrdem)
+	{
 	addGroup(_("SETTINGS"));
 
 	// CONTROLLER CONFIGURATION
@@ -214,8 +223,16 @@ GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSe
 	addWithLabel(_("RESTRICT HOTKEYS TO EXIT"), restrictHotkeys);
 	addSaveFunc([restrictHotkeys] { SystemConf::getInstance()->setBool("global.exithotkeyonly", restrictHotkeys->getState()); });
 #endif
+	} // fim do bloco escondido na tela do Arcadia
 
-	addGroup(controllers_group_label);
+	// Arcadia: ate 4 jogadores na tela simplificada; o menu completo segue com MAX_PLAYERS
+	int maxPlayers = arcadiaOrdem ? 4 : MAX_PLAYERS;
+	std::string defaultLabel = arcadiaOrdem ? _("AUTOMATIC") : _("default");
+
+	if (arcadiaOrdem)
+		addGroup(_("WHICH CONTROLLER EACH PLAYER USES"));
+	else
+		addGroup(controllers_group_label);
 
 	// Here we go; for each player
 	std::list<int> alreadyTaken = std::list<int>();
@@ -228,12 +245,12 @@ GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSe
 	auto configList = InputManager::getInstance()->getInputConfigs();
 
 #if WIN32
-	for (int player = 0; player < MAX_PLAYERS; player++)
+	for (int player = 0; player < maxPlayers; player++)
 	{
 		std::string label = Utils::String::format(gettext_controllerid.c_str(), player + 1);
 
 		auto inputOptionList = std::make_shared<OptionListComponent<InputConfigInfo*> >(mWindow, label, false);
-		inputOptionList->add(_("default"), nullptr, false);
+		inputOptionList->add(defaultLabel, nullptr, false);
 		options.push_back(inputOptionList);
 
 		// Checking if a setting has been saved, else setting to default
@@ -303,16 +320,17 @@ GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSe
 		addWithLabel(label, inputOptionList);
 	}
 #else
-	for (int player = 0; player < MAX_PLAYERS; player++)
+	for (int player = 0; player < maxPlayers; player++)
 	{
 		std::string confName = Utils::String::format("INPUT P%iNAME", player + 1);
 		std::string confGuid = Utils::String::format("INPUT P%iGUID", player + 1);
 		std::string confPath = Utils::String::format("INPUT P%iPATH", player + 1);
 
-		std::string label = Utils::String::format(gettext_playerid.c_str(), player + 1);
+		// Arcadia: rotulo curto ("JOGADOR 1") para caber o nome do controle
+		std::string label = arcadiaOrdem ? Utils::String::format(_("PLAYER %i").c_str(), player + 1) : Utils::String::format(gettext_playerid.c_str(), player + 1);
 
 		auto inputOptionList = std::make_shared<OptionListComponent<InputConfigInfo*> >(mWindow, label, false);
-		inputOptionList->add(_("default"), nullptr, false);
+		inputOptionList->add(defaultLabel, nullptr, false);
 		options.push_back(inputOptionList);
 
 		// Checking if a setting has been saved, else setting to default
@@ -360,7 +378,7 @@ GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSe
 	{
 		bool changed = false;
 
-		for (int player = 0; player < MAX_PLAYERS; player++)
+		for (int player = 0; player < (int)options.size(); player++)
 		{
 			std::string confName = Utils::String::format("INPUT P%iNAME", player + 1);
 			std::string confGuid = Utils::String::format("INPUT P%iGUID", player + 1);
@@ -391,6 +409,28 @@ GuiControllersSettings::GuiControllersSettings(Window* wnd, int autoSel) : GuiSe
 		// this is dependant of this configuration, thus update it
 		InputManager::getInstance()->computeLastKnownPlayersDeviceIndexes();
 	});
+
+	// Arcadia: desfaz as escolhas e volta a ordem de conexao para todos os jogadores
+	if (arcadiaOrdem)
+	{
+		addGroup(_("AUTOMATIC"));
+		addEntry(_("RESET TO CONNECTION ORDER"), false, [this, window]
+		{
+			for (int player = 0; player < MAX_PLAYERS; player++)
+			{
+				Settings::getInstance()->setString(Utils::String::format("INPUT P%iNAME", player + 1), "DEFAULT");
+				Settings::getInstance()->setString(Utils::String::format("INPUT P%iGUID", player + 1), "");
+				Settings::getInstance()->setString(Utils::String::format("INPUT P%iPATH", player + 1), "");
+			}
+			Settings::getInstance()->saveFile();
+			InputManager::getInstance()->computeLastKnownPlayersDeviceIndexes();
+
+			Window* parent = window;
+			setSave(false);
+			delete this;
+			openArcadiaPlayerOrder(parent);
+		});
+	}
 }
 
 void GuiControllersSettings::openControllersSpecificSettings_sindengun()

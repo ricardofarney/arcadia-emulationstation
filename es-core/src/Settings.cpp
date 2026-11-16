@@ -137,6 +137,8 @@ void Settings::setDefaults()
 	mStringMap["FavoriteSystems"] = "";
 	mBoolMap["ArcadiaFavoriteSystems"] = true;
 	mBoolMap["ArcadiaMenuSimples"] = true;
+	// Arcadia: jogadores sem controle definido seguem a ordem de conexao (docs/MULTIJOGADOR.md)
+	mBoolMap["ArcadiaOrdemConexao"] = true;
 
 #if WIN32
 	mBoolMap["HidJoysticks"] = true;

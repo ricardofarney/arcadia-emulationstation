@@ -1137,7 +1137,12 @@ std::map<int, InputConfig*> InputManager::computePlayersConfigs()
 			availableConfigured.push_back(conf.second);
 
 	// sort available configs
-	std::sort(availableConfigured.begin(), availableConfigured.end(), [](InputConfig * a, InputConfig * b) -> bool { return a->getSortDevicePath() < b->getSortDevicePath(); });
+	// Arcadia: controles livres seguem a ordem de conexao (o SDL numera cada controle novo
+	// com um ID de instancia crescente); sem a opcao, volta a ordem por caminho do upstream
+	if (Settings::getInstance()->getBool("ArcadiaOrdemConexao"))
+		std::sort(availableConfigured.begin(), availableConfigured.end(), [](InputConfig * a, InputConfig * b) -> bool { return a->getDeviceId() < b->getDeviceId(); });
+	else
+		std::sort(availableConfigured.begin(), availableConfigured.end(), [](InputConfig * a, InputConfig * b) -> bool { return a->getSortDevicePath() < b->getSortDevicePath(); });
 
 	// 2. Pour chaque joueur verifier si il y a un configurated
 	// associer le input au joueur
